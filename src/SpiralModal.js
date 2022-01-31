@@ -1,42 +1,62 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Container, Button, Modal } from '@nextui-org/react';
 
-const SpiralModal = ({ id }) => {
+const SpiralModal = ({ id, countCallback, buttonEnabled }) => {
+useState(false);
     const [canvas, setCanvas] = useState(null);
     const [visible, setVisible] = useState(false);
+    const [drawing, setDrawing] = useState(false);
+    let startTime;
 
     const showModal = () => setVisible(true);
 
     const setCanvasRef = useCallback(node => {
         if (node) {
             setCanvas(node);
+            setDrawing(true);
+            startTime = new Date();
+        }
+    }, []);
+
+    const spaceFunction = useCallback((event) => {
+        if (event.keyCode === 32) {
+            setDrawing(false);
+            const seconds = (new Date() - startTime) / 1000
+            countCallback(Math.round((seconds - 0.75) / 1.5 + 2));
         }
     }, []);
 
     const draw = (canvas, context, time) => {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        const gap = 3;
-        const steps = 60;
-        const increment = 2 * Math.PI / steps;
-        let theta = increment;
-        context.strokeStyle = '#ffffff'
-        context.lineWidth = 4;
-        context.beginPath();
-        context.moveTo(canvas.width / 2, canvas.height / 2);
-        while (theta < (time / 1500) * Math.PI) {
-            const x = canvas.width / 2 + theta * Math.cos(theta) * gap;
-            const y = canvas.height / 2 + theta * Math.sin(theta) * gap;
-            context.lineTo(x, y);
-            theta += increment;
+        if (drawing) {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            const gap = 3;
+            const steps = 60;
+            const increment = 2 * Math.PI / steps;
+            let theta = increment;
+            context.strokeStyle = '#ffffff'
+            context.lineWidth = 4;
+            context.beginPath();
+            context.moveTo(canvas.width / 2, canvas.height / 2);
+            while (theta < (time / 1500) * Math.PI) {
+                const x = canvas.width / 2 + theta * Math.cos(theta) * gap;
+                const y = canvas.height / 2 + theta * Math.sin(theta) * gap;
+                context.lineTo(x, y);
+                theta += increment;
+            }
+            context.stroke();
+            context.beginPath();
+            context.moveTo(0, 0);
+            context.lineTo(canvas.width, canvas.height);
+            context.stroke();
         }
-
-        context.stroke();
     };
 
     useEffect(() => {
         if (!visible || !canvas) {
             return;
         }
+
+        document.addEventListener("keydown", spaceFunction, false);
 
         const context = canvas.getContext("2d");
 
@@ -55,7 +75,7 @@ const SpiralModal = ({ id }) => {
 
     return (
         <Container>
-            <Button onClick={showModal}>Ready</Button>
+            <Button onClick={showModal} disabled={!buttonEnabled}>Ready</Button>
             <Modal id={id} open={visible}>
                 <canvas id={id} ref={setCanvasRef} width="400" height="400"/>
             </Modal>
