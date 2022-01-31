@@ -38,7 +38,6 @@ const SpiralModal = ({ id }) => {
             return;
         }
 
-        // const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
 
         let animationFrameId;
@@ -55,7 +54,6 @@ const SpiralModal = ({ id }) => {
     }, [draw]);
 
     return (
-        // TODO: disable this open and figure out how to check
         <Container>
             <Button onClick={showModal}>Ready</Button>
             <Modal id={id} open={visible}>
