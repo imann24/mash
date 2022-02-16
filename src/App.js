@@ -1,25 +1,37 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Container, createTheme, NextUIProvider } from "@nextui-org/react"
 
 import PresetQuestion from "./PresetQuestion";
 import InputQuestion from "./InputQuestion";
 import SpiralModal from "./SpiralModal";
+import MashOption from "./MashOption";
 
 const darkTheme = createTheme({
     type: "dark"
 });
 
-const crossOut = (crossOutCount) => {
-    console.log("Cross out every", crossOutCount);
-};
-
 const App = () => {
-    const [spouses, setSpouses] = useState(null);
-    const [cars, setCars] = useState(null);
+    const [_, update] = useState(null);
+    const [housing, setHousing] = useState(["Mansion", "Apartment", "Shack", "House"].map(
+        (v) => new MashOption(v)
+    ));
+    const [kidCount, setKidCount] = useState([1, 2, 3, 4].map(
+        (v) => new MashOption(v)
+    ));
+    const spouses = useRef(Array.from({length: 4}, () => new MashOption("")))
+    const cars = useRef(Array.from({length: 4}, () => new MashOption("")));
     const [buttonEnabled, setButtonEnabled] = useState(false);
 
+    const crossOut = (crossOutCount) => {
+        console.log("Cross out every", crossOutCount);
+        const allAnswers = [...housing, ...kidCount, ...spouses.current, ...cars.current];
+        console.log(allAnswers);
+    };
+
     useEffect(() => {
-        setButtonEnabled(spouses && cars);
+        const spousesSet = Boolean(spouses.current) && spouses.current.filter((s) => !s.value).length === 0;
+        const carsSet = Boolean(cars.current) && cars.current.filter((c) => !c.value).length === 0;
+        setButtonEnabled(spousesSet && carsSet);
     });
 
     return(
@@ -27,26 +39,30 @@ const App = () => {
             <Container>
                 <PresetQuestion id="housing"
                                 question="Where will you live?"
-                                options={["Mansion", "Apartment", "Shack", "House"]}/>
+                                options={housing}/>
                 <PresetQuestion id="children"
                                 question="How many kids will you have?"
-                                options={[1, 2, 3, 4]}/>
+                                options={kidCount}/>
                 <InputQuestion id="spouse"
                                answeredCallback={
                                    (answers) => {
-                                       setSpouses(answers);
+                                       spouses.current = [...answers];
+                                       update({});
                                    }
                                }
                                text="Who will you marry?"/>
                 <InputQuestion id="car"
                                answeredCallback={
                                     (answers) => {
-                                        setCars(answers);
+                                        cars.current = [...answers];
+                                        update({});
                                     }
                                }
                                text="What type of car will you drive?"/>
             </Container>
-            <SpiralModal id="spiralCount" countCallback={crossOut} buttonEnabled={buttonEnabled}/>
+            <SpiralModal id="spiralCount" countCallback={(count) => {
+                crossOut(count)
+            }} buttonEnabled={buttonEnabled}/>
         </NextUIProvider>
     );
 }

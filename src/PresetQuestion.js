@@ -6,7 +6,7 @@ const PresetQuestion = ({ id, question, options }) =>
         <Text>{question}</Text>
         <Button.Group>
             {options.map((opt) =>
-                <Button key={opt}>{opt}</Button>
+                <Button key={opt.value}>{opt.value}</Button>
             )}
         </Button.Group>
     </Container>

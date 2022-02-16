@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Container, Button, Modal } from '@nextui-org/react';
 
 const SpiralModal = ({ id, countCallback, buttonEnabled }) => {
-useState(false);
     const [canvas, setCanvas] = useState(null);
     const [visible, setVisible] = useState(false);
     const [drawing, setDrawing] = useState(false);
-    let startTime;
+    const [startTime, setStartTime] = useState(new Date());
+    const [callbackFired, setCallbackFired] = useState(false);
 
     const showModal = () => setVisible(true);
 
@@ -14,15 +14,16 @@ useState(false);
         if (node) {
             setCanvas(node);
             setDrawing(true);
-            startTime = new Date();
+            setStartTime(new Date());
         }
     }, []);
 
     const spaceFunction = useCallback((event) => {
-        if (event.keyCode === 32) {
+        if (event.keyCode === 32 && !callbackFired) {
             setDrawing(false);
             const seconds = (new Date() - startTime) / 1000
-            countCallback(Math.round((seconds - 0.75) / 1.5 + 2));
+            countCallback(Math.round((seconds - 0.75) / 1.5) + 2);
+            setCallbackFired(true);
         }
     }, []);
 
