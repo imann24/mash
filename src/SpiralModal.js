@@ -22,13 +22,15 @@ const SpiralModal = ({ id, countCallback, buttonEnabled }) => {
         if (event.keyCode === 32 && !callbackFired) {
             setDrawing(false);
             const seconds = (new Date() - startTime) / 1000
-            countCallback(Math.round((seconds - 0.75) / 1.5) + 2);
+            countCallback(Math.round((seconds - 0.75) / 1.5) - 2);
             setCallbackFired(true);
         }
     }, []);
 
     const draw = (canvas, context, time) => {
         if (drawing) {
+            // only count time since the spiral started
+            time = new Date() - startTime;
             context.clearRect(0, 0, canvas.width, canvas.height);
             const gap = 3;
             const steps = 60;

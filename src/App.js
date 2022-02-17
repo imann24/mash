@@ -24,7 +24,48 @@ const App = () => {
 
     const crossOut = (crossOutCount) => {
         console.log("Cross out every", crossOutCount);
+        const allOptions = [housing, kidCount, spouses.current, cars.current];
         const allAnswers = [...housing, ...kidCount, ...spouses.current, ...cars.current];
+        const chosenHouse = {}, chosenKidCount = {}, chosenSpouse = {}, chosenCar = {};
+        const choices = [chosenHouse, chosenKidCount, chosenSpouse, chosenCar];
+        let pointer = -1;
+        let counter = 0;
+        let breaker = 0;
+        while (breaker < 100000 && (!chosenHouse.value || !chosenKidCount.value || !chosenSpouse.value || !chosenCar.value)) {
+            breaker++;
+            pointer++;
+            if (pointer === allAnswers.length) {
+                pointer = 0;
+            }
+            if (allAnswers[pointer].crossedOut || allAnswers[pointer].chosen) {
+                continue;
+            }
+
+            if (counter == crossOutCount) {
+                let optionIndex = Math.round(pointer / allOptions.length);
+                const current = allAnswers[pointer];
+                if (optionIndex === allOptions.length) {
+                    optionIndex--;
+                }
+                const option = allOptions[optionIndex];
+                let candidates = option.filter((v) => !v.crossedOut);
+                allAnswers[pointer].crossedOut = true;
+                let cBefore = [...candidates];
+                if (candidates.length === 2 && candidates.includes(current)) {
+                    candidates = candidates.filter((c) => c !== current);
+                }
+                if (candidates.length === 1) {
+                    choices[optionIndex].value = candidates[0].value;
+                    candidates[0].chosen = true;
+                    candidates[0].crossedOut = false;
+                }
+                // offset for the increment by 1
+                counter = -1;
+            }
+
+            counter++;
+        }
+        console.log(choices);
         console.log(allAnswers);
     };
 
