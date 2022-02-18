@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Container, Button, Modal } from '@nextui-org/react';
 
 const SpiralModal = ({ id, countCallback, buttonEnabled }) => {
-useState(false);
     const [canvas, setCanvas] = useState(null);
     const [visible, setVisible] = useState(false);
     const [drawing, setDrawing] = useState(false);
-    let startTime;
+    const [startTime, setStartTime] = useState(new Date());
+    const [callbackFired, setCallbackFired] = useState(false);
 
     const showModal = () => setVisible(true);
 
@@ -14,20 +14,27 @@ useState(false);
         if (node) {
             setCanvas(node);
             setDrawing(true);
-            startTime = new Date();
+            setStartTime(new Date());
         }
     }, []);
 
+    const stopAndCount = useCallback(() => {
+        setDrawing(false);
+        const seconds = (new Date() - startTime) / 1000
+        countCallback(Math.round((seconds - 0.75) / 1.5) + 1);
+        setCallbackFired(true);
+    }, []);
+
     const spaceFunction = useCallback((event) => {
-        if (event.keyCode === 32) {
-            setDrawing(false);
-            const seconds = (new Date() - startTime) / 1000
-            countCallback(Math.round((seconds - 0.75) / 1.5 + 2));
+        if (event.keyCode === 32 && !callbackFired) {
+            stopAndCount();
         }
     }, []);
 
     const draw = (canvas, context, time) => {
         if (drawing) {
+            // only count time since the spiral started
+            time = new Date() - startTime;
             context.clearRect(0, 0, canvas.width, canvas.height);
             const gap = 3;
             const steps = 60;
@@ -78,6 +85,7 @@ useState(false);
             <Button onClick={showModal} disabled={!buttonEnabled}>Ready</Button>
             <Modal id={id} open={visible}>
                 <canvas id={id} ref={setCanvasRef} width="400" height="400"/>
+                <Button onClick={stopAndCount}>Stop</Button>
             </Modal>
         </Container>
     );

@@ -1810,6 +1810,11 @@ dns-txt@^2.0.2:
   dependencies:
     buffer-indexof "^1.0.0"
 
+dynamic-class-list@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/dynamic-class-list/-/dynamic-class-list-2.0.1.tgz#5335021b375e64b7d5840194be91dace6aa79a4e"
+  integrity sha512-kaPvIH0W/SWvVTaqY0doaSLpAXJBIupuI9dLtrwBh7v9tlAwTleujTRL4YC4I7C1i/dd/7gfBn3yIfHtV5CrEw==
+
 ee-first@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"

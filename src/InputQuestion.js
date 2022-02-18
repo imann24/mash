@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import Answer from "./Answer";
 import { Container, Text } from '@nextui-org/react';
+import MashOption from "./MashOption";
 
 const InputQuestion = ({ id, text, answeredCallback }) => {
-    const [answers, setAnswers] = useState(Array(4).fill(""));
+    const [answers, setAnswers] = useState(Array.from({length: 4}, () => new MashOption("", id)));
 
     return (
         <Container>
@@ -13,13 +14,9 @@ const InputQuestion = ({ id, text, answeredCallback }) => {
                         num={i + 1}
                         onChangeCallback={
                             (evt) => {
-                                answers[i] = evt.target.value;
+                                answers[i] = new MashOption(evt.target.value, answers[i].type);
                                 setAnswers(answers);
-                                if (answers.every(Boolean)) {
-                                    answeredCallback(answers);
-                                } else {
-                                    answeredCallback(null);
-                                }
+                                answeredCallback(answers);
                             }
                         }
                         id={id}/>

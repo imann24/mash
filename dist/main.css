@@ -1,3 +1,16 @@
+li {
+    text-align: left;
+}
+
 .nextui-input-label--left {
     width: 2.5em;
+}
+
+.crossed-out {
+    text-decoration: line-through;
+}
+
+.chosen {
+    background-color: var(--nextui-colors-selection);
+    color: black;
 }
