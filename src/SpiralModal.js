@@ -18,12 +18,16 @@ const SpiralModal = ({ id, countCallback, buttonEnabled }) => {
         }
     }, []);
 
+    const stopAndCount = useCallback(() => {
+        setDrawing(false);
+        const seconds = (new Date() - startTime) / 1000
+        countCallback(Math.round((seconds - 0.75) / 1.5) + 1);
+        setCallbackFired(true);
+    }, []);
+
     const spaceFunction = useCallback((event) => {
         if (event.keyCode === 32 && !callbackFired) {
-            setDrawing(false);
-            const seconds = (new Date() - startTime) / 1000
-            countCallback(Math.round((seconds - 0.75) / 1.5) + 1);
-            setCallbackFired(true);
+            stopAndCount();
         }
     }, []);
 
@@ -81,6 +85,7 @@ const SpiralModal = ({ id, countCallback, buttonEnabled }) => {
             <Button onClick={showModal} disabled={!buttonEnabled}>Ready</Button>
             <Modal id={id} open={visible}>
                 <canvas id={id} ref={setCanvasRef} width="400" height="400"/>
+                <Button onClick={stopAndCount}>Stop</Button>
             </Modal>
         </Container>
     );

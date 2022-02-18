@@ -11,6 +11,8 @@ const darkTheme = createTheme({
     type: "dark"
 });
 
+const crossOutDelayMs = 250;
+
 const App = () => {
     const housingKey = "housing";
     const spouseKey = "spouse";
@@ -31,32 +33,38 @@ const App = () => {
 
     const crossOut = (crossOutCount) => {
         setShowList(true);
-
         console.log("Cross out every", crossOutCount);
         const allAnswers = [...housing, ...kidCount, ...spouses.current, ...cars.current];
         const choices = {};
-        let breaker = 0;
+        setTimeout(() => {
+            crossOutStep(crossOutCount, allAnswers, choices)
+        }, crossOutDelayMs);
+    };
+
+    const crossOutStep = (crossOutCount, remainingAnswers, choices) => {
         let counter = 0;
-        while (Object.keys(choices).length < 4 && allAnswers.length) {
-            const ans = allAnswers.shift();
+        while (Object.keys(choices).length < 4 && remainingAnswers.length) {
+            const ans = remainingAnswers.shift();
             if (counter === crossOutCount) {
                 ans.crossedOut = true;
-                const remaining = allAnswers.filter((c) => c.type === ans.type);
+                const remaining = remainingAnswers.filter((c) => c.type === ans.type);
                 if (remaining.length === 1) {
                     const selected = remaining[0];
                     selected.chosen = true;
                     choices[selected.type] = selected;
-                    allAnswers.splice(allAnswers.indexOf(selected), 1);
+                    remainingAnswers.splice(remainingAnswers.indexOf(selected), 1);
                 }
                 counter = 0;
                 update({});
+                setTimeout(() => {
+                    crossOutStep(crossOutCount, remainingAnswers, choices)
+                }, crossOutDelayMs);
+                break;
             } else {
-                allAnswers.push(ans);
+                remainingAnswers.push(ans);
             }
             counter++;
-            breaker++;
         }
-        console.log(choices);
     };
 
     useEffect(() => {

@@ -1,5 +1,6 @@
 import React from "react";
-import { Container, Grid, Modal, Card, Spacer, Text } from '@nextui-org/react';
+import { Container, Grid, Modal, Card, Spacer, Text } from "@nextui-org/react";
+import { cl as DynamicClassList } from "dynamic-class-list";
 
 const CrossOutList = ({ listGroups, shouldShowList }) => {
     return (
@@ -16,7 +17,10 @@ const CrossOutList = ({ listGroups, shouldShowList }) => {
                                     <ol key={key + "-list"}>
                                         {vals.map((el) =>
                                             <li key={key + el.value}
-                                                className={el.crossedOut ? "crossed-out" : ""}>
+                                                className={DynamicClassList({
+                                                    "crossed-out": el.crossedOut,
+                                                    "chosen": el.chosen
+                                                })}>
                                                 {el.value}
                                             </li>
                                         )}

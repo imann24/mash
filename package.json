@@ -8,6 +8,7 @@
     },
     "dependencies": {
         "@nextui-org/react": "^1.0.2-beta.3",
+        "dynamic-class-list": "^2.0.1",
         "react": "^17.0.2",
         "react-dom": "^17.0.2"
     },
