@@ -27,20 +27,17 @@ const App = () => {
     const spouses = useRef(Array.from({length: 4}, () => new MashOption("", spouseKey)))
     const cars = useRef(Array.from({length: 4}, () => new MashOption("", carKey)));
     const [buttonEnabled, setButtonEnabled] = useState(false);
+    const [shouldShowList, setShowList] = useState(false);
 
     const crossOut = (crossOutCount) => {
+        setShowList(true);
+
         console.log("Cross out every", crossOutCount);
-        // const allOptions = [housing, kidCount, spouses.current, cars.current];
         const allAnswers = [...housing, ...kidCount, ...spouses.current, ...cars.current];
-        document.answers = allAnswers;
-        const answerCopy = [...housing, ...kidCount, ...spouses.current, ...cars.current];
-        // const chosenHouse = {}, chosenKidCount = {}, chosenSpouse = {}, chosenCar = {};
         const choices = {};
-        // let pointer = -1;
-        // let counter = 0;
         let breaker = 0;
         let counter = 0;
-        while (breaker < 10000 && Object.keys(choices).length < 4 && allAnswers.length) {
+        while (Object.keys(choices).length < 4 && allAnswers.length) {
             const ans = allAnswers.shift();
             if (counter === crossOutCount) {
                 ans.crossedOut = true;
@@ -52,6 +49,7 @@ const App = () => {
                     allAnswers.splice(allAnswers.indexOf(selected), 1);
                 }
                 counter = 0;
+                update({});
             } else {
                 allAnswers.push(ans);
             }
@@ -59,7 +57,6 @@ const App = () => {
             breaker++;
         }
         console.log(choices);
-        console.log(answerCopy);
     };
 
     useEffect(() => {
@@ -100,7 +97,8 @@ const App = () => {
             <CrossOutList listGroups={{[housingKey]: housing,
                                        [kidsKey]: kidCount,
                                        [spouseKey]: spouses.current,
-                                       [carKey]: cars.current}}/>
+                                       [carKey]: cars.current}}
+                          shouldShowList={shouldShowList}/>
         </NextUIProvider>
     );
 }

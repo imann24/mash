@@ -1,7 +1,11 @@
+li {
+    text-align: left;
+}
+
 .nextui-input-label--left {
     width: 2.5em;
 }
 
-li {
-    text-align: left;
+.crossed-out {
+    text-decoration: line-through;
 }
