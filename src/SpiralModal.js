@@ -22,7 +22,7 @@ const SpiralModal = ({ id, countCallback, buttonEnabled }) => {
         if (event.keyCode === 32 && !callbackFired) {
             setDrawing(false);
             const seconds = (new Date() - startTime) / 1000
-            countCallback(Math.round((seconds - 0.75) / 1.5) - 2);
+            countCallback(Math.round((seconds - 0.75) / 1.5) + 1);
             setCallbackFired(true);
         }
     }, []);

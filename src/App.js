@@ -5,68 +5,61 @@ import PresetQuestion from "./PresetQuestion";
 import InputQuestion from "./InputQuestion";
 import SpiralModal from "./SpiralModal";
 import MashOption from "./MashOption";
+import CrossOutList from "./CrossOutList";
 
 const darkTheme = createTheme({
     type: "dark"
 });
 
 const App = () => {
+    const housingKey = "housing";
+    const spouseKey = "spouse";
+    const kidsKey = "kids";
+    const carKey = "car"
+
     const [_, update] = useState(null);
     const [housing, setHousing] = useState(["Mansion", "Apartment", "Shack", "House"].map(
-        (v) => new MashOption(v)
+        (v) => new MashOption(v, housingKey)
     ));
     const [kidCount, setKidCount] = useState([1, 2, 3, 4].map(
-        (v) => new MashOption(v)
+        (v) => new MashOption(v, kidsKey)
     ));
-    const spouses = useRef(Array.from({length: 4}, () => new MashOption("")))
-    const cars = useRef(Array.from({length: 4}, () => new MashOption("")));
+    const spouses = useRef(Array.from({length: 4}, () => new MashOption("", spouseKey)))
+    const cars = useRef(Array.from({length: 4}, () => new MashOption("", carKey)));
     const [buttonEnabled, setButtonEnabled] = useState(false);
 
     const crossOut = (crossOutCount) => {
         console.log("Cross out every", crossOutCount);
-        const allOptions = [housing, kidCount, spouses.current, cars.current];
+        // const allOptions = [housing, kidCount, spouses.current, cars.current];
         const allAnswers = [...housing, ...kidCount, ...spouses.current, ...cars.current];
-        const chosenHouse = {}, chosenKidCount = {}, chosenSpouse = {}, chosenCar = {};
-        const choices = [chosenHouse, chosenKidCount, chosenSpouse, chosenCar];
-        let pointer = -1;
-        let counter = 0;
+        document.answers = allAnswers;
+        const answerCopy = [...housing, ...kidCount, ...spouses.current, ...cars.current];
+        // const chosenHouse = {}, chosenKidCount = {}, chosenSpouse = {}, chosenCar = {};
+        const choices = {};
+        // let pointer = -1;
+        // let counter = 0;
         let breaker = 0;
-        while (breaker < 100000 && (!chosenHouse.value || !chosenKidCount.value || !chosenSpouse.value || !chosenCar.value)) {
-            breaker++;
-            pointer++;
-            if (pointer === allAnswers.length) {
-                pointer = 0;
-            }
-            if (allAnswers[pointer].crossedOut || allAnswers[pointer].chosen) {
-                continue;
-            }
-
-            if (counter == crossOutCount) {
-                let optionIndex = Math.round(pointer / allOptions.length);
-                const current = allAnswers[pointer];
-                if (optionIndex === allOptions.length) {
-                    optionIndex--;
+        let counter = 0;
+        while (breaker < 10000 && Object.keys(choices).length < 4 && allAnswers.length) {
+            const ans = allAnswers.shift();
+            if (counter === crossOutCount) {
+                ans.crossedOut = true;
+                const remaining = allAnswers.filter((c) => c.type === ans.type);
+                if (remaining.length === 1) {
+                    const selected = remaining[0];
+                    selected.chosen = true;
+                    choices[selected.type] = selected;
+                    allAnswers.splice(allAnswers.indexOf(selected), 1);
                 }
-                const option = allOptions[optionIndex];
-                let candidates = option.filter((v) => !v.crossedOut);
-                allAnswers[pointer].crossedOut = true;
-                let cBefore = [...candidates];
-                if (candidates.length === 2 && candidates.includes(current)) {
-                    candidates = candidates.filter((c) => c !== current);
-                }
-                if (candidates.length === 1) {
-                    choices[optionIndex].value = candidates[0].value;
-                    candidates[0].chosen = true;
-                    candidates[0].crossedOut = false;
-                }
-                // offset for the increment by 1
-                counter = -1;
+                counter = 0;
+            } else {
+                allAnswers.push(ans);
             }
-
             counter++;
+            breaker++;
         }
         console.log(choices);
-        console.log(allAnswers);
+        console.log(answerCopy);
     };
 
     useEffect(() => {
@@ -78,13 +71,13 @@ const App = () => {
     return(
         <NextUIProvider theme={darkTheme}>
             <Container>
-                <PresetQuestion id="housing"
+                <PresetQuestion id={housingKey}
                                 question="Where will you live?"
                                 options={housing}/>
-                <PresetQuestion id="children"
+                <PresetQuestion id={kidsKey}
                                 question="How many kids will you have?"
                                 options={kidCount}/>
-                <InputQuestion id="spouse"
+                <InputQuestion id={spouseKey}
                                answeredCallback={
                                    (answers) => {
                                        spouses.current = [...answers];
@@ -92,7 +85,7 @@ const App = () => {
                                    }
                                }
                                text="Who will you marry?"/>
-                <InputQuestion id="car"
+                <InputQuestion id={carKey}
                                answeredCallback={
                                     (answers) => {
                                         cars.current = [...answers];
@@ -104,6 +97,10 @@ const App = () => {
             <SpiralModal id="spiralCount" countCallback={(count) => {
                 crossOut(count)
             }} buttonEnabled={buttonEnabled}/>
+            <CrossOutList listGroups={{[housingKey]: housing,
+                                       [kidsKey]: kidCount,
+                                       [spouseKey]: spouses.current,
+                                       [carKey]: cars.current}}/>
         </NextUIProvider>
     );
 }

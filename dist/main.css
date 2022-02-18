@@ -1,3 +1,7 @@
 .nextui-input-label--left {
     width: 2.5em;
 }
+
+li {
+    text-align: left;
+}
